@@ -1,11 +1,12 @@
 package com.lhyla.interactivewebapp.service;
 
 import com.lhyla.interactivewebapp.data.entity.Data;
-import com.lhyla.interactivewebapp.data.repository.data.DataDao;
+import com.lhyla.interactivewebapp.data.repository.DataDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.util.*;
 
 @Service
 public class DataService {
@@ -18,5 +19,26 @@ public class DataService {
 
     public Optional<Data> getLatestData() {
         return dataDao.getLatestDataByMeasurementDate();
+    }
+
+    public Optional<BigDecimal> getAvgDataBetween(final Date from,
+                                                  final Date to,
+                                                  final boolean isIncludeBad) {
+        return dataDao.getAvgDataBetween(
+                from,
+                to,
+                getRequestedQualities(isIncludeBad)
+        );
+    }
+
+    private Set<Data.Quality> getRequestedQualities(final boolean isIncludeBad) {
+        Set<Data.Quality> requestedQuality = new HashSet<>();
+        requestedQuality.add(Data.Quality.GOOD);
+
+        if (isIncludeBad) {
+            requestedQuality.add(Data.Quality.BAD);
+        }
+
+        return Collections.unmodifiableSet(requestedQuality);
     }
 }

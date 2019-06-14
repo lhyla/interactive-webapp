@@ -2,12 +2,11 @@ package com.lhyla.interactivewebapp.data.repository;
 
 import com.lhyla.interactivewebapp.data.entity.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Handles more complicated business logic
@@ -25,7 +24,7 @@ public class DataDao {
     }
 
     public Optional<Data> getLatestDataByMeasurementDate() {
-        return dataRepository.findFirstByOrderByMeasurementDateDescIdDesc();
+        return dataRepository.findTopByOrderByMeasurementDateDescIdDesc();
     }
 
     public Optional<BigDecimal> getAvgDataBetween(final Date from,
@@ -33,5 +32,16 @@ public class DataDao {
                                                   final Set<Data.Quality> requestedQualities) {
 
         return dataRepository.getAvgValueBetween(from, to, requestedQualities);
+    }
+
+    public List<Data> getGoodDataBetween(Date from, Date to, Integer limit) {
+        return Collections.unmodifiableList(
+                dataRepository.findByQualityAndMeasurementDateBetweenOrderByMeasurementDateDescIdDesc(
+                        Data.Quality.GOOD,
+                        from,
+                        to,
+                        PageRequest.of(0, limit)
+                )
+        );
     }
 }

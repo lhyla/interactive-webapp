@@ -30,8 +30,6 @@ public class Data {
     private Quality quality = Quality.BAD;
 
     public enum EngineeringUnit {
-        LITER,
-        GALLON,
         BARREL
     }
 

@@ -2,6 +2,7 @@ package com.lhyla.interactivewebapp.service;
 
 import com.lhyla.interactivewebapp.data.entity.Data;
 import com.lhyla.interactivewebapp.data.repository.DataDao;
+import com.lhyla.interactivewebapp.util.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +22,21 @@ public class DataService {
         return dataDao.getLatestDataByMeasurementDate();
     }
 
-    public Optional<BigDecimal> getAvgDataBetween(final Date from,
-                                                  final Date to,
+    public Optional<BigDecimal> getAvgDataBetween(final String from,
+                                                  final String to,
                                                   final boolean isIncludeBad) {
         return dataDao.getAvgDataBetween(
-                from,
-                to,
+                DataUtils.parseToDate(from),
+                DataUtils.parseToDate(to),
                 getRequestedQualities(isIncludeBad)
+        );
+    }
+
+    public List<Data> getGoodDataBetween(final String from, final String to, Integer limit) {
+        return dataDao.getGoodDataBetween(
+                DataUtils.parseToDate(from),
+                DataUtils.parseToDate(to),
+                limit
         );
     }
 

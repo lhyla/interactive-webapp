@@ -16,6 +16,11 @@
 
 	<properties>
 		<java.version>11</java.version>
+		<modelmapper.version>2.3.4</modelmapper.version>
+		<commons-math3.version>3.2</commons-math3.version>
+		<junit-jupiter-api.version>5.3.2</junit-jupiter-api.version>
+		<joda-time.version>2.10.1</joda-time.version>
+		<junit-jupiter-params.version>5.3.1</junit-jupiter-params.version>
 	</properties>
 
 	<dependencies>
@@ -65,8 +70,32 @@
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
-			<version>2.3.4</version>
+			<version>${modelmapper.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>${commons-math3.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit-jupiter-api.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
+            <scope>test</scope>
+        </dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<version>${junit-jupiter-params.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

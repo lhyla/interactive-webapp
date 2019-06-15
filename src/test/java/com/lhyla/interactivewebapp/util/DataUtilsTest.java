@@ -12,7 +12,7 @@ class DataUtilsTest {
 
     @Test
     void parseToDate_midnightDate_parsed() {
-        //for
+        //given
         String date = "2019-06-14.00:00:00";
 
         //when
@@ -30,7 +30,7 @@ class DataUtilsTest {
 
     @Test
     void parseToDate_wrongDate_exception() {
-        //for
+        //given
         String date = "2019-06-14T00:00:00";
 
         //when

@@ -7,6 +7,7 @@ import java.util.Date;
 public class DataUtils {
 
     public static final String DATE_FORMAT = "yyyy-MM-dd.HH:mm:ss";
+    public static final int MILLIS_IN_MINUTE = 60000;
 
     /**
      * @return Create Date object from String in format yyyyMMddhhmmss

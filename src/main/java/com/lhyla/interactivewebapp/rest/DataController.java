@@ -42,8 +42,8 @@ public class DataController {
     }
 
     /**
-     * @param from         olderDate
-     * @param to           newerDate
+     * @param from         olderDate in format yyyy-MM-dd.HH:mm:ss
+     * @param to           newerDate in format yyyy-MM-dd.HH:mm:ss
      * @param isIncludeBad not required, by default false. If true, records with GOOD and BAD quality
      *                     will be taken into consideration in the avg value calculation
      *                     otherwise only records with GOOD quality will take part in calculation the avg of value
@@ -62,10 +62,10 @@ public class DataController {
     }
 
     /**
-     * @param from  olderDate
-     * @param to    newerDate
+     * @param from  olderDate in format yyyy-MM-dd.HH:mm:ss
+     * @param to    newerDate in format yyyy-MM-dd.HH:mm:ss
      * @param limit of records which will be returned, not required and by default setup to 1000
-     * @return series of good values between two dates sorted by measurementDate descending and id descending
+     * @return interpolated value in given time
      */
     @RequestMapping(
             value = "/series",
@@ -78,5 +78,24 @@ public class DataController {
             @RequestParam(value = "limit", required = false, defaultValue = "1000") Integer limit) {
         return dataMapper
                 .map(dataService.getGoodDataBetween(from, to, limit));
+    }
+
+    /**
+     * @param from               olderDate in format yyyy-MM-dd.HH:mm:ss
+     * @param to                 newerDate in format yyyy-MM-dd.HH:mm:ss
+     * @param intervalsInMinutes custom interval in minutes
+     * @return interpolated values in given intervals from specific period of time
+     */
+    @RequestMapping(
+            value = "/interpolate",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<DataDto> getInterpolation(@RequestParam(value = "from") String from,
+                                          @RequestParam(value = "to") String to,
+                                          @RequestParam(value = "intervals") int intervalsInMinutes) {
+        return dataMapper.map(
+                dataService.getInterpolation(from, to, intervalsInMinutes)
+        );
     }
 }

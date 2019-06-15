@@ -2,6 +2,7 @@ package com.lhyla.interactivewebapp.service;
 
 import com.lhyla.interactivewebapp.data.entity.Data;
 import com.lhyla.interactivewebapp.data.repository.DataDao;
+import com.lhyla.interactivewebapp.service.interpolation.LinearInterpolationService;
 import com.lhyla.interactivewebapp.util.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,9 +14,12 @@ import java.util.*;
 public class DataService {
 
     private DataDao dataDao;
+    private LinearInterpolationService interpolationService;
 
-    public DataService(@Autowired DataDao dataDao) {
+    public DataService(@Autowired DataDao dataDao,
+                       @Autowired LinearInterpolationService interpolationService) {
         this.dataDao = dataDao;
+        this.interpolationService = interpolationService;
     }
 
     public Optional<Data> getLatestData() {
@@ -32,8 +36,10 @@ public class DataService {
         );
     }
 
-    public List<Data> getGoodDataBetween(final String from, final String to, Integer limit) {
-        return dataDao.getGoodDataBetween(
+    public List<Data> getGoodDataBetween(final String from,
+                                         final String to,
+                                         final Integer limit) {
+        return dataDao.getSortedGoodDataBetween(
                 DataUtils.parseToDate(from),
                 DataUtils.parseToDate(to),
                 limit
@@ -49,5 +55,15 @@ public class DataService {
         }
 
         return Collections.unmodifiableSet(requestedQuality);
+    }
+
+    public List<Data> getInterpolation(final String from,
+                                       final String to,
+                                       final int intervalsInMinutes) {
+        return interpolationService.interpolate(
+                DataUtils.parseToDate(from),
+                DataUtils.parseToDate(to),
+                intervalsInMinutes
+        );
     }
 }

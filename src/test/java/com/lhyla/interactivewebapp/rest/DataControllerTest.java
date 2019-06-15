@@ -70,6 +70,7 @@ class DataControllerTest {
                 .map(BigDecimal::toString)
                 .get()
                 .isEqualTo("30.00");
+        assertThat(latest).map(DataDto::getType).get().isEqualTo(DataDto.Type.MEASURED);
     }
 
     @Test
@@ -103,14 +104,18 @@ class DataControllerTest {
         );
 
         //when
-        Optional<BigDecimal> average = dataController.getAverageBetween(
+        Optional<DataDto> dataDto = dataController.getAverageBetween(
                 DataUtils.parseToDate(measurementDate1),
                 DataUtils.parseToDate(measurementDate3),
                 false
         );
 
         //then
-        assertThat(average).isPresent().map(BigDecimal::toString).get().isEqualTo("50.0");
+        assertThat(dataDto).isPresent().map(DataDto::getValue).map(BigDecimal::toString).get().isEqualTo("50.0");
+        assertThat(dataDto).map(DataDto::getType).get().isEqualTo(DataDto.Type.AVERAGE);
+        assertThat(dataDto).map(DataDto::getId).isEmpty();
+        assertThat(dataDto).map(DataDto::getMeasurementDate).isEmpty();
+        assertThat(dataDto).map(DataDto::getQuality).isEmpty();
     }
 
     @Test
@@ -144,14 +149,18 @@ class DataControllerTest {
         );
 
         //when
-        Optional<BigDecimal> average = dataController.getAverageBetween(
+        Optional<DataDto> dataDto = dataController.getAverageBetween(
                 DataUtils.parseToDate(measurementDate1),
                 DataUtils.parseToDate(measurementDate3),
                 true
         );
 
         //then
-        assertThat(average).isPresent().map(BigDecimal::toString).get().isEqualTo("100.0");
+        assertThat(dataDto).isPresent().map(DataDto::getValue).map(BigDecimal::toString).get().isEqualTo("100.0");
+        assertThat(dataDto).map(DataDto::getType).get().isEqualTo(DataDto.Type.AVERAGE);
+        assertThat(dataDto).map(DataDto::getId).isEmpty();
+        assertThat(dataDto).map(DataDto::getMeasurementDate).isEmpty();
+        assertThat(dataDto).map(DataDto::getQuality).isEmpty();
     }
 
     @Test
@@ -219,5 +228,86 @@ class DataControllerTest {
         assertThat(result).size().isEqualTo(2);
         assertEquals(result.get(0).getValue().toString(), "200.00");
         assertEquals(result.get(1).getValue().toString(), "110.00");
+        assertThat(result).allMatch(e -> e.getType() == DataDto.Type.MEASURED);
+    }
+
+    @Test
+    void getInterpolatedData() {
+        //given
+        Date measurementDate1 = new DateTime().withTimeAtStartOfDay().minusHours(3).toDate();
+        dataRepository.save(Data.builder()
+                .measurementDate(measurementDate1)
+                .quality(Data.Quality.GOOD)
+                .engineeringUnit(Data.EngineeringUnit.BARREL)
+                .value(BigDecimal.valueOf(5))
+                .build()
+        );
+
+        dataRepository.save(Data.builder()
+                .measurementDate(new DateTime().withTimeAtStartOfDay().minusHours(2).toDate())
+                .quality(Data.Quality.GOOD)
+                .engineeringUnit(Data.EngineeringUnit.BARREL)
+                .value(BigDecimal.valueOf(6))
+                .build()
+        );
+
+        dataRepository.save(Data.builder()
+                .measurementDate(new DateTime().withTimeAtStartOfDay().minusHours(1).toDate())
+                .quality(Data.Quality.GOOD)
+                .engineeringUnit(Data.EngineeringUnit.BARREL)
+                .value(BigDecimal.valueOf(7))
+                .build()
+        );
+
+        dataRepository.save(Data.builder()
+                .measurementDate(new DateTime().withTimeAtStartOfDay().toDate())
+                .quality(Data.Quality.GOOD)
+                .engineeringUnit(Data.EngineeringUnit.BARREL)
+                .value(BigDecimal.valueOf(8))
+                .build()
+        );
+
+        dataRepository.save(Data.builder()
+                .measurementDate(new DateTime().withTimeAtStartOfDay().plusHours(1).toDate())
+                .quality(Data.Quality.GOOD)
+                .engineeringUnit(Data.EngineeringUnit.BARREL)
+                .value(BigDecimal.valueOf(7))
+                .build()
+        );
+
+        dataRepository.save(Data.builder()
+                .measurementDate(new DateTime().withTimeAtStartOfDay().plusHours(2).toDate())
+                .quality(Data.Quality.GOOD)
+                .engineeringUnit(Data.EngineeringUnit.BARREL)
+                .value(BigDecimal.valueOf(4))
+                .build()
+        );
+
+        Date measurementDate2 = new DateTime().withTimeAtStartOfDay().plusHours(3).toDate();
+        dataRepository.save(Data.builder()
+                .measurementDate(measurementDate2)
+                .quality(Data.Quality.GOOD)
+                .engineeringUnit(Data.EngineeringUnit.BARREL)
+                .value(BigDecimal.valueOf(3))
+                .build()
+        );
+
+        //when
+        List<DataDto> result = dataController.getInterpolation(
+                DataUtils.parseToDate(measurementDate1),
+                DataUtils.parseToDate(measurementDate2),
+                1
+        );
+
+        //then
+        assertThat(result).size().isEqualTo(361);
+        assertThat(result).allMatch(e -> e.getType() == DataDto.Type.INTERPOLATED);
+        assertThat(result).allMatch(e -> e.getId() == null);
+        assertThat(result).allMatch(e -> e.getQuality() == null);
+        assertThat(result).allMatch(e -> e.getMeasurementDate().getTime() >= measurementDate1.getTime());
+        assertThat(result).allMatch(e -> e.getMeasurementDate().getTime() <= measurementDate2.getTime());
+        assertThat(result).allMatch(e -> e.getValue() != null);
+        assertThat(result).allMatch(e -> e.getValue().doubleValue() <= 8d);
+        assertThat(result).allMatch(e -> e.getValue().doubleValue() >= 3d);
     }
 }

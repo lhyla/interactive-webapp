@@ -7,7 +7,6 @@ import com.lhyla.interactivewebapp.util.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -26,14 +25,20 @@ public class DataService {
         return dataDao.getLatestDataByMeasurementDate();
     }
 
-    public Optional<BigDecimal> getAvgDataBetween(final String from,
-                                                  final String to,
-                                                  final boolean isIncludeBad) {
-        return dataDao.getAvgDataBetween(
+    public Optional<Data> getAvgDataBetween(final String from,
+                                            final String to,
+                                            final boolean isIncludeBad) {
+        Data data = Data.builder()
+                .engineeringUnit(Data.EngineeringUnit.BARREL)
+                .build();
+
+        dataDao.getAvgDataBetween(
                 DataUtils.parseToDate(from),
                 DataUtils.parseToDate(to),
                 getRequestedQualities(isIncludeBad)
-        );
+        ).ifPresent(data::setValue);
+
+        return Optional.of(data);
     }
 
     public List<Data> getGoodDataBetween(final String from,

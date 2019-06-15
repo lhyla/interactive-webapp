@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,18 +34,21 @@ public class DataController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public Optional<DataDto> getLatest() {
-        Optional<DataDto> dataDto = dataService
+        Optional<DataDto> data = dataService
                 .getLatestData()
                 .map(dataMapper::map);
-        return dataDto;
+        data.ifPresent(e -> e.setType(DataDto.Type.MEASURED));
+
+        return data;
     }
 
     /**
      * @param from         olderDate in format yyyy-MM-dd.HH:mm:ss
      * @param to           newerDate in format yyyy-MM-dd.HH:mm:ss
-     * @param isIncludeBad not required, by default false. If true, records with GOOD and BAD quality
+     * @param isIncludeBad If true, records with GOOD and BAD quality
      *                     will be taken into consideration in the avg value calculation
      *                     otherwise only records with GOOD quality will take part in calculation the avg of value
+     *                     not required, default = false
      * @return average value between two dates
      */
     @RequestMapping(
@@ -54,18 +56,23 @@ public class DataController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public Optional<BigDecimal> getAverageBetween(
+    public Optional<DataDto> getAverageBetween(
             @RequestParam(value = "from") String from,
             @RequestParam(value = "to") String to,
             @RequestParam(value = "includeBadValues", required = false, defaultValue = "false") final boolean isIncludeBad) {
-        return dataService.getAvgDataBetween(from, to, isIncludeBad);
+        Optional<DataDto> dataDto = dataService
+                .getAvgDataBetween(from, to, isIncludeBad)
+                .map(dataMapper::map);
+        dataDto.ifPresent(e -> e.setType(DataDto.Type.AVERAGE));
+
+        return dataDto;
     }
 
     /**
      * @param from  olderDate in format yyyy-MM-dd.HH:mm:ss
      * @param to    newerDate in format yyyy-MM-dd.HH:mm:ss
-     * @param limit of records which will be returned, not required and by default setup to 1000
-     * @return interpolated value in given time
+     * @param limit of records which will be returned, not required, default = 1000
+     * @return good values between given dates
      */
     @RequestMapping(
             value = "/series",
@@ -76,14 +83,18 @@ public class DataController {
             @RequestParam(value = "from") String from,
             @RequestParam(value = "to") String to,
             @RequestParam(value = "limit", required = false, defaultValue = "1000") Integer limit) {
-        return dataMapper
-                .map(dataService.getGoodDataBetween(from, to, limit));
+        List<DataDto> data = dataMapper.map(
+                dataService.getGoodDataBetween(from, to, limit)
+        );
+        data.forEach(e -> e.setType(DataDto.Type.MEASURED));
+
+        return data;
     }
 
     /**
      * @param from               olderDate in format yyyy-MM-dd.HH:mm:ss
      * @param to                 newerDate in format yyyy-MM-dd.HH:mm:ss
-     * @param intervalsInMinutes custom interval in minutes
+     * @param intervalsInMinutes custom interval in minutes, not required, default = 1
      * @return interpolated values in given intervals from specific period of time
      */
     @RequestMapping(
@@ -93,9 +104,12 @@ public class DataController {
     )
     public List<DataDto> getInterpolation(@RequestParam(value = "from") String from,
                                           @RequestParam(value = "to") String to,
-                                          @RequestParam(value = "intervals") int intervalsInMinutes) {
-        return dataMapper.map(
+                                          @RequestParam(value = "intervals", defaultValue = "1", required = false) int intervalsInMinutes) {
+        List<DataDto> interpolatedData = dataMapper.map(
                 dataService.getInterpolation(from, to, intervalsInMinutes)
         );
+        interpolatedData.forEach(e -> e.setType(DataDto.Type.INTERPOLATED));
+
+        return interpolatedData;
     }
 }

@@ -40,7 +40,7 @@ class DataMapperTest {
     @ParameterizedTest
     @MethodSource("simpleData")
     void mapToDto_simpleData_mapped(Data data) {
-        //for
+        //given
         //when
         DataDto result = new DataMapper().map(data);
 
@@ -53,7 +53,7 @@ class DataMapperTest {
 
     @Test
     void mapToListDto() {
-        //for
+        //given
         Data source1 = Data.builder()
                 .engineeringUnit(Data.EngineeringUnit.BARREL)
                 .id(1L)

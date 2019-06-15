@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-interface DataRepository extends JpaRepository<Data, BigInteger> {
+public interface DataRepository extends JpaRepository<Data, BigInteger> {
 
     Optional<Data> findTopByOrderByMeasurementDateDescIdDesc();
 

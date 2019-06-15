@@ -22,6 +22,7 @@ public class Data {
     private Date measurementDate;
     private BigDecimal value;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private EngineeringUnit engineeringUnit;
 

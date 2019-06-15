@@ -34,13 +34,26 @@ public class DataDao {
         return dataRepository.getAvgValueBetween(from, to, requestedQualities);
     }
 
-    public List<Data> getGoodDataBetween(Date from, Date to, Integer limit) {
+    public List<Data> getSortedGoodDataBetween(final Date from,
+                                               final Date to,
+                                               final Integer limit) {
         return Collections.unmodifiableList(
                 dataRepository.findByQualityAndMeasurementDateBetweenOrderByMeasurementDateDescIdDesc(
                         Data.Quality.GOOD,
                         from,
                         to,
                         PageRequest.of(0, limit)
+                )
+        );
+    }
+
+    public Set<Data> getGoodDataBetween(final Date from,
+                                        final Date to) {
+        return Collections.unmodifiableSet(
+                dataRepository.findByQualityAndMeasurementDateBetween(
+                        Data.Quality.GOOD,
+                        from,
+                        to
                 )
         );
     }

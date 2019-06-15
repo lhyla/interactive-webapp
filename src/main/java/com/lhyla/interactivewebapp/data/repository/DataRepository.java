@@ -27,4 +27,10 @@ public interface DataRepository extends JpaRepository<Data, BigInteger> {
             Date to,
             Pageable pagable
     );
+
+    Set<Data> findByQualityAndMeasurementDateBetween(
+            Data.Quality quality,
+            Date from,
+            Date to
+    );
 }

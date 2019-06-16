@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.lhyla</groupId>
-	<artifactId>interactive-webapp</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>interactive-webapp</name>
-	<description>Simple Spring Boot application</description>
+	<artifactId>measures-app</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>measures-app</name>
+	<description>Simple application which exposes measures results</description>
 
 	<properties>
 		<java.version>11</java.version>

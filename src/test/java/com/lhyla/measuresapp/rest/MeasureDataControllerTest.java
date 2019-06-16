@@ -3,8 +3,10 @@ package com.lhyla.measuresapp.rest;
 import com.lhyla.measuresapp.H2TestProfileJPAConfig;
 import com.lhyla.measuresapp.MeasuresAppApplication;
 import com.lhyla.measuresapp.data.entity.MeasureData;
-import com.lhyla.measuresapp.data.repository.MeasureDataRepository;
+import com.lhyla.measuresapp.data.repository.measure.MeasureDataRepository;
 import com.lhyla.measuresapp.dto.MeasureDataDto;
+import com.lhyla.measuresapp.dto.avg.AvgMeasureDataDto;
+import com.lhyla.measuresapp.dto.avg.AvgMeasureDataStatsDto;
 import com.lhyla.measuresapp.util.MeasuresAppUtils;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.AfterEach;
@@ -16,9 +18,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -74,14 +78,14 @@ class MeasureDataControllerTest {
     }
 
     @Test
-    void getAverageBetween_onlyGoodValues_avg50() {
+    void getAverageBetween() {
         //given
         Date measurementDate1 = new DateTime().withTimeAtStartOfDay().minusHours(1).toDate();
         measureDataRepository.save(MeasureData.builder()
                 .measurementDate(measurementDate1)
                 .quality(MeasureData.Quality.GOOD)
                 .engineeringUnit(MeasureData.EngineeringUnit.BARREL)
-                .value(BigDecimal.valueOf(0))
+                .value(BigDecimal.valueOf(1))
                 .build()
         );
 
@@ -90,7 +94,7 @@ class MeasureDataControllerTest {
                 .measurementDate(measurementDate2)
                 .quality(MeasureData.Quality.GOOD)
                 .engineeringUnit(MeasureData.EngineeringUnit.BARREL)
-                .value(BigDecimal.valueOf(100))
+                .value(BigDecimal.valueOf(3))
                 .build()
         );
 
@@ -99,68 +103,48 @@ class MeasureDataControllerTest {
                 .measurementDate(measurementDate3)
                 .quality(MeasureData.Quality.BAD)
                 .engineeringUnit(MeasureData.EngineeringUnit.BARREL)
-                .value(BigDecimal.valueOf(200))
+                .value(BigDecimal.valueOf(2))
                 .build()
         );
 
-        //when
-        Optional<MeasureDataDto> dataDto = measureDataController.getAverageBetween(
-                MeasuresAppUtils.parseToDate(measurementDate1),
-                MeasuresAppUtils.parseToDate(measurementDate3),
-                false
-        );
-
-        //then
-        assertThat(dataDto).isPresent().map(MeasureDataDto::getValue).map(BigDecimal::toString).get().isEqualTo("50.0");
-        assertThat(dataDto).map(MeasureDataDto::getType).get().isEqualTo(MeasureDataDto.Type.AVERAGE);
-        assertThat(dataDto).map(MeasureDataDto::getId).isEmpty();
-        assertThat(dataDto).map(MeasureDataDto::getMeasurementDate).isEmpty();
-        assertThat(dataDto).map(MeasureDataDto::getQuality).isEmpty();
-    }
-
-    @Test
-    void getAverageBetween_goodAndBadValues_avg100() {
-        //given
-        Date measurementDate1 = new DateTime().withTimeAtStartOfDay().minusHours(1).toDate();
-        measureDataRepository.save(MeasureData.builder()
-                .measurementDate(measurementDate1)
-                .quality(MeasureData.Quality.GOOD)
-                .engineeringUnit(MeasureData.EngineeringUnit.BARREL)
-                .value(BigDecimal.valueOf(0))
-                .build()
-        );
-
-        Date measurementDate2 = new DateTime().withTimeAtStartOfDay().toDate();
-        measureDataRepository.save(MeasureData.builder()
-                .measurementDate(measurementDate2)
-                .quality(MeasureData.Quality.GOOD)
-                .engineeringUnit(MeasureData.EngineeringUnit.BARREL)
-                .value(BigDecimal.valueOf(100))
-                .build()
-        );
-
-        Date measurementDate3 = new DateTime().withTimeAtStartOfDay().plusHours(1).toDate();
         measureDataRepository.save(MeasureData.builder()
                 .measurementDate(measurementDate3)
                 .quality(MeasureData.Quality.BAD)
                 .engineeringUnit(MeasureData.EngineeringUnit.BARREL)
-                .value(BigDecimal.valueOf(200))
+                .value(BigDecimal.valueOf(4))
                 .build()
         );
 
-        //when
-        Optional<MeasureDataDto> dataDto = measureDataController.getAverageBetween(
+        Optional<AvgMeasureDataDto> avgData = measureDataController.getAverageBetween(
                 MeasuresAppUtils.parseToDate(measurementDate1),
-                MeasuresAppUtils.parseToDate(measurementDate3),
-                true
+                MeasuresAppUtils.parseToDate(measurementDate3)
         );
 
         //then
-        assertThat(dataDto).isPresent().map(MeasureDataDto::getValue).map(BigDecimal::toString).get().isEqualTo("100.0");
-        assertThat(dataDto).map(MeasureDataDto::getType).get().isEqualTo(MeasureDataDto.Type.AVERAGE);
-        assertThat(dataDto).map(MeasureDataDto::getId).isEmpty();
-        assertThat(dataDto).map(MeasureDataDto::getMeasurementDate).isEmpty();
-        assertThat(dataDto).map(MeasureDataDto::getQuality).isEmpty();
+        assertThat(avgData).isPresent().map(AvgMeasureDataDto::getAvg).map(BigDecimal::toString).get().isEqualTo("2.5");
+
+        Set<AvgMeasureDataStatsDto> avgDataStats = avgData.get().getAvgDataStats();
+        assertThat(avgDataStats.size()).isEqualTo(2);
+
+        AvgMeasureDataStatsDto goodDataStats = avgDataStats.stream()
+                .filter(e -> AvgMeasureDataStatsDto.Quality.GOOD.equals(e.getQuality()))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(goodDataStats.getAvg().setScale(1, RoundingMode.DOWN).toString()).isEqualTo("2.0");
+        assertThat(goodDataStats.getMin().setScale(1, RoundingMode.DOWN).toString()).isEqualTo("1.0");
+        assertThat(goodDataStats.getMax().setScale(1, RoundingMode.DOWN).toString()).isEqualTo("3.0");
+        assertThat(goodDataStats.getCount().toString()).isEqualTo("2");
+
+        AvgMeasureDataStatsDto badDataStats = avgDataStats.stream()
+                .filter(e -> AvgMeasureDataStatsDto.Quality.BAD.equals(e.getQuality()))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(badDataStats.getAvg().setScale(1, RoundingMode.DOWN).toString()).isEqualTo("3.0");
+        assertThat(badDataStats.getMin().setScale(1, RoundingMode.DOWN).toString()).isEqualTo("2.0");
+        assertThat(badDataStats.getMax().setScale(1, RoundingMode.DOWN).toString()).isEqualTo("4.0");
+        assertThat(badDataStats.getCount().toString()).isEqualTo("2");
     }
 
     @Test

@@ -1,7 +1,7 @@
 package com.lhyla.measuresapp.service.interpolation;
 
 import com.lhyla.measuresapp.data.entity.MeasureData;
-import com.lhyla.measuresapp.data.repository.MeasureDataDao;
+import com.lhyla.measuresapp.data.repository.measure.MeasureDataDao;
 import com.lhyla.measuresapp.exception.InterpolationException;
 import com.lhyla.measuresapp.util.MeasuresAppUtils;
 import lombok.AllArgsConstructor;

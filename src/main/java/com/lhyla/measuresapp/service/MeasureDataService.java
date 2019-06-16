@@ -1,7 +1,6 @@
 package com.lhyla.measuresapp.service;
 
-import com.lhyla.measuresapp.data.entity.MeasureData;
-import com.lhyla.measuresapp.data.repository.MeasureDataDao;
+import com.lhyla.measuresapp.data.repository.measure.MeasureDataDao;
 import com.lhyla.measuresapp.dto.MeasureDataDto;
 import com.lhyla.measuresapp.mapper.MeasureDataMapper;
 import com.lhyla.measuresapp.service.interpolation.LinearInterpolationService;
@@ -9,7 +8,8 @@ import com.lhyla.measuresapp.util.MeasuresAppUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -26,22 +26,6 @@ public class MeasureDataService {
         dataDto.ifPresent(e -> e.setType(MeasureDataDto.Type.MEASURED));
 
         return dataDto;
-    }
-
-    public Optional<MeasureDataDto> getAvgDataBetween(final String from,
-                                                      final String to,
-                                                      final boolean isIncludeBad) {
-        MeasureDataDto data = MeasureDataDto.builder()
-                .type(MeasureDataDto.Type.AVERAGE)
-                .build();
-
-        measureDataDao.getAvgDataBetween(
-                MeasuresAppUtils.parseToDate(from),
-                MeasuresAppUtils.parseToDate(to),
-                getRequestedQualities(isIncludeBad)
-        ).ifPresent(data::setValue);
-
-        return Optional.of(data);
     }
 
     public List<MeasureDataDto> getGoodDataBetween(final String from,
@@ -72,16 +56,5 @@ public class MeasureDataService {
         data.forEach(e -> e.setType(MeasureDataDto.Type.INTERPOLATED));
 
         return data;
-    }
-
-    private Set<MeasureData.Quality> getRequestedQualities(final boolean isIncludeBad) {
-        Set<MeasureData.Quality> requestedQuality = new HashSet<>();
-        requestedQuality.add(MeasureData.Quality.GOOD);
-
-        if (isIncludeBad) {
-            requestedQuality.add(MeasureData.Quality.BAD);
-        }
-
-        return Collections.unmodifiableSet(requestedQuality);
     }
 }

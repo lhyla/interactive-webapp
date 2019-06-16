@@ -1,11 +1,10 @@
-package com.lhyla.measuresapp.data.repository;
+package com.lhyla.measuresapp.data.repository.measure;
 
 import com.lhyla.measuresapp.data.entity.MeasureData;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -14,24 +13,14 @@ import java.util.*;
  * <p>
  * Also could contain logic, which query method from repository should be executed, based on parameters values
  */
-@Component
+@Service
+@AllArgsConstructor
 public class MeasureDataDao {
 
     private MeasureDataRepository measureDataRepository;
 
-    public MeasureDataDao(@Autowired MeasureDataRepository measureDataRepository) {
-        this.measureDataRepository = measureDataRepository;
-    }
-
     public Optional<MeasureData> getLatestDataByMeasurementDate() {
         return measureDataRepository.findTopByOrderByMeasurementDateDescIdDesc();
-    }
-
-    public Optional<BigDecimal> getAvgDataBetween(final Date from,
-                                                  final Date to,
-                                                  final Set<MeasureData.Quality> requestedQualities) {
-
-        return measureDataRepository.getAvgValueBetween(from, to, requestedQualities);
     }
 
     public List<MeasureData> getSortedGoodDataBetween(final Date from,

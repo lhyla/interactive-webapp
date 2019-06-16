@@ -1,6 +1,8 @@
 package com.lhyla.measuresapp.rest;
 
 import com.lhyla.measuresapp.dto.MeasureDataDto;
+import com.lhyla.measuresapp.dto.avg.AvgMeasureDataDto;
+import com.lhyla.measuresapp.service.AvgMeasureDataService;
 import com.lhyla.measuresapp.service.MeasureDataService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class MeasureDataController {
 
     private MeasureDataService measureDataService;
+    private AvgMeasureDataService avgMeasureDataService;
 
     /**
      * @return latest value, along with timestamp and quality
@@ -31,12 +34,8 @@ public class MeasureDataController {
     }
 
     /**
-     * @param from         olderDate in format yyyy-MM-dd.HH:mm:ss
-     * @param to           newerDate in format yyyy-MM-dd.HH:mm:ss
-     * @param isIncludeBad If true, records with GOOD and BAD quality
-     *                     will be taken into consideration in the avg value calculation
-     *                     otherwise only records with GOOD quality will take part in calculation the avg of value
-     *                     not required, default = false
+     * @param from olderDate in format yyyy-MM-dd.HH:mm:ss
+     * @param to   newerDate in format yyyy-MM-dd.HH:mm:ss
      * @return average value between two dates
      */
     @RequestMapping(
@@ -44,13 +43,10 @@ public class MeasureDataController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public Optional<MeasureDataDto> getAverageBetween(
+    public Optional<AvgMeasureDataDto> getAverageBetween(
             @RequestParam(value = "from") String from,
-            @RequestParam(value = "to") String to,
-            @RequestParam(value = "includeBadValues",
-                    required = false,
-                    defaultValue = "false") final boolean isIncludeBad) {
-        return measureDataService.getAvgDataBetween(from, to, isIncludeBad);
+            @RequestParam(value = "to") String to) {
+        return avgMeasureDataService.getAvgDataBetween(from, to);
     }
 
     /**

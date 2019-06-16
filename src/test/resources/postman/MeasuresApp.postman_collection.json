@@ -1,0 +1,179 @@
+{
+	"info": {
+		"_postman_id": "e144f279-6701-4e0e-9bb7-ec3de9fb34dc",
+		"name": "MeasuresApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GetByLatestDate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bfdbcdf1-71cc-49bb-9570-bebf4cd5148e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/data/v1/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"data",
+						"v1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAvg",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7a7390cd-e807-477e-97d0-ea7c9681f872",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/data/v1/avg?from=2019-06-14.00:00:00&to=2019-06-15.00:00:00",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"data",
+						"v1",
+						"avg"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "2019-06-14.00:00:00"
+						},
+						{
+							"key": "to",
+							"value": "2019-06-15.00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetSeriesOfGoodValues",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "58d3d30e-0145-4560-883f-0b69c7bee3cc",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/data/v1/series?from=2019-06-14.00:00:00&to=2019-06-15.00:00:00&limit=10",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"data",
+						"v1",
+						"series"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "2019-06-14.00:00:00"
+						},
+						{
+							"key": "to",
+							"value": "2019-06-15.00:00:00"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetInterpolatedValue",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "454e03f2-7df3-4be3-a26f-d148e48dceea",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/data/v1/interpolate?from=2019-06-14.11:00:00&to=2019-06-14.23:30:00&intervals=7",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"data",
+						"v1",
+						"interpolate"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "2019-06-14.11:00:00"
+						},
+						{
+							"key": "to",
+							"value": "2019-06-14.23:30:00"
+						},
+						{
+							"key": "intervals",
+							"value": "7"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

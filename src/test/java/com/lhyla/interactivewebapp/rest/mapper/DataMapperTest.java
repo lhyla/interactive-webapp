@@ -28,10 +28,10 @@ class DataMapperTest {
                         .build()
                 ),
                 Arguments.of(Data.builder()
-                        .engineeringUnit(null)
-                        .id(null)
-                        .quality(null)
-                        .measurementDate(null)
+                        .engineeringUnit(Data.EngineeringUnit.BARREL)
+                        .id(2L)
+                        .quality(Data.Quality.BAD)
+                        .measurementDate(new Date())
                         .build()
                 )
         );
@@ -47,8 +47,30 @@ class DataMapperTest {
         //then
         assertEquals(result.getValue(), data.getValue());
         assertEquals(result.getMeasurementDate(), data.getMeasurementDate());
-        assertEquals(result.getQuality(), data.getQuality());
+        assertEquals(result.getQuality().name(), data.getQuality().name());
         assertEquals(result.getId(), data.getId());
+        assertNull(result.getType());
+    }
+
+    @Test
+    void mapToDto_nullData_mapped() {
+        //given
+        Data data = Data.builder()
+                .engineeringUnit(null)
+                .id(null)
+                .quality(null)
+                .measurementDate(null)
+                .build();
+
+        //when
+        DataDto result = new DataMapper().map(data);
+
+        //then
+        assertNull(result.getId());
+        assertNull(result.getType());
+        assertNull(result.getMeasurementDate());
+        assertNull(result.getQuality());
+        assertNull(result.getValue());
     }
 
     @Test
@@ -74,7 +96,7 @@ class DataMapperTest {
         //then
         assertEquals(resultList.size(), 2);
 
-        DataDto result1 = getSingleResult(resultList, Data.Quality.GOOD);
+        DataDto result1 = getSingleResult(resultList, DataDto.Quality.GOOD);
         assertEquals(result1.getMeasurementDate(), source1.getMeasurementDate());
         assertEquals(result1.getValue(), source1.getValue());
         assertEquals(result1.getId(), source1.getId());
@@ -85,7 +107,7 @@ class DataMapperTest {
         assertEquals(result2.getId(), source2.getId());
     }
 
-    private DataDto getSingleResult(List<DataDto> resultList, Data.Quality quality) {
+    private DataDto getSingleResult(List<DataDto> resultList, DataDto.Quality quality) {
         return resultList
                 .stream()
                 .filter(e -> Objects.equals(quality, e.getQuality()))

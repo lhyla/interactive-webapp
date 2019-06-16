@@ -15,8 +15,6 @@ import java.util.*;
 @Service
 public class LinearInterpolationService implements InterpolationService {
 
-    private static final long DIVIDER = 1_000_000_000;
-
     private DataDao dataDao;
 
     public LinearInterpolationService(@Autowired DataDao dataDao) {
@@ -45,7 +43,7 @@ public class LinearInterpolationService implements InterpolationService {
         }
     }
 
-    private PolynomialSplineFunction getSplineFunction(Set<Data> data) {
+    private PolynomialSplineFunction getSplineFunction(final Set<Data> data) {
         return new LinearInterpolator()
                 .interpolate(
                         getMeasurementDateTimesInMillis(data),
@@ -65,15 +63,13 @@ public class LinearInterpolationService implements InterpolationService {
         return data.stream()
                 .map(Data::getMeasurementDate)
                 .filter(Objects::nonNull)
-                .mapToDouble(e -> e.getTime() / DataUtils.MILLIS_IN_MINUTE)
+                .mapToDouble(e -> e.getTime())
                 .toArray();
     }
 
-    private double[] getIntervals(long from,
-                                  long to,
+    private double[] getIntervals(final long from,
+                                  final long to,
                                   final int intervalsInMinutes) {
-        from = from / DataUtils.MILLIS_IN_MINUTE;
-        to = to / DataUtils.MILLIS_IN_MINUTE;
 
         long intervalsSize = (to - from) / intervalsInMinutes;
 
@@ -81,7 +77,7 @@ public class LinearInterpolationService implements InterpolationService {
         intervalsList.add(Long.valueOf(from));
 
         for (int i = 1; i < intervalsSize; i++) {
-            long interval = intervalsList.get(i - 1) + intervalsInMinutes;
+            long interval = intervalsList.get(i - 1) + (intervalsInMinutes * DataUtils.MILLIS_IN_MINUTE);
 
             if (interval > to || interval < from) {
                 break;
@@ -105,12 +101,10 @@ public class LinearInterpolationService implements InterpolationService {
         return Collections.unmodifiableList(data);
     }
 
-    private Data buildData(double interval, double value) {
+    private Data buildData(final double interval, final double value) {
         return Data.builder()
                 .value(BigDecimal.valueOf(value))
                 .engineeringUnit(Data.EngineeringUnit.BARREL)
-                .quality(Data.Quality.GOOD)
-                .id(null)
                 .measurementDate(new Date((long) interval))
                 .build();
     }

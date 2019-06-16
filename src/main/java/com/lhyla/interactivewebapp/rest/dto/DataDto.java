@@ -1,7 +1,6 @@
 package com.lhyla.interactivewebapp.rest.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.lhyla.interactivewebapp.data.entity.Data;
 import com.lhyla.interactivewebapp.util.DataUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,8 +17,20 @@ public class DataDto {
 
     private Long id;
 
-    @JsonFormat(pattern= DataUtils.DATE_FORMAT, timezone = "Europe/Berlin")
+    @JsonFormat(pattern = DataUtils.DATE_FORMAT, timezone = "Europe/Berlin")
     private Date measurementDate;
     private BigDecimal value;
-    private Data.Quality quality;
+    private DataDto.Quality quality;
+    private DataDto.Type type;
+
+    public enum Quality {
+        GOOD,
+        BAD
+    }
+
+    public enum Type {
+        MEASURED,
+        AVERAGE,
+        INTERPOLATED
+    }
 }

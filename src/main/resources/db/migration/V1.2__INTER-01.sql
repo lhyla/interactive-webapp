@@ -1,5 +1,3 @@
---Prepared to introduce flyway migrations in next releases. Did not planed in 1.0 version
-
 INSERT INTO public."data" VALUES ((select nextval('public."data_seq"')), 'BARREL', '2019-06-14 00:00:000', 'GOOD', 1.34);
 INSERT INTO public."data" VALUES ((select nextval('public."data_seq"')), 'BARREL', '2019-06-14 00:30:000', 'GOOD', 1.35);
 INSERT INTO public."data" VALUES ((select nextval('public."data_seq"')), 'BARREL', '2019-06-14 01:00:000', 'BAD', 1.36);

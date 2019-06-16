@@ -1,4 +1,4 @@
-CREATE TABLE public."data" (
+CREATE TABLE public."measure_data" (
 	id bigint NOT NULL,
 	engineering_unit varchar(255) NOT NULL,
 	measurement_date timestamp NULL,
@@ -9,7 +9,7 @@ CREATE TABLE public."data" (
 	CONSTRAINT data_pkey PRIMARY KEY (id)
 );
 
-CREATE SEQUENCE if not exists public.data_seq
+CREATE SEQUENCE if not exists public.measure_data_seq
 	INCREMENT BY 50
 	MINVALUE 1
 	MAXVALUE 9223372036854775807

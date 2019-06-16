@@ -148,7 +148,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/data/v1/interpolate?from=2019-06-14.11:05:00&to=2019-06-14.12:30:00&intervals=10",
+					"raw": "{{url}}/data/v1/interpolate?from=2019-06-14.05:00:00&to=2019-06-14.12:30:00&intervals=10",
 					"host": [
 						"{{url}}"
 					],
@@ -160,7 +160,7 @@
 					"query": [
 						{
 							"key": "from",
-							"value": "2019-06-14.11:05:00"
+							"value": "2019-06-14.05:00:00"
 						},
 						{
 							"key": "to",

@@ -1,9 +1,11 @@
-CREATE TABLE if not exists public."data" (
-	id int8 NOT NULL,
+CREATE TABLE public."data" (
+	id bigint NOT NULL,
 	engineering_unit varchar(255) NOT NULL,
 	measurement_date timestamp NULL,
 	quality varchar(255) NOT NULL,
-	value numeric(19,2) NULL,
+	value numeric(20,4) NULL,
+	db_creation_date timestamp NULL DEFAULT statement_timestamp(),
+	db_modify_date timestamp NULL DEFAULT statement_timestamp(),
 	CONSTRAINT data_pkey PRIMARY KEY (id)
 );
 

@@ -15,6 +15,10 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"MeasurmentDate correct\", function () {\r",
+							"    pm.expect(pm.response.json().measurementDate).to.equal(\"2019-06-14.23:30:00\");\r",
 							"});"
 						],
 						"type": "text/javascript"
@@ -91,7 +95,25 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"MeasurmentDate correct\", function () {\r",
+							"    pm.expect(pm.response.json()[0].measurementDate).to.equal(\"2019-06-14.23:30:00\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"MeasurmentDate correct\", function () {\r",
+							"    pm.expect(pm.response.json()[pm.response.json().length-1].measurementDate).to.equal(\"2019-06-14.17:30:00\");\r",
 							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1237eb6c-c54f-4416-a55b-a9d73d5f935c",
+						"exec": [
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -138,6 +160,14 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"MeasurmentDate correct\", function () {\r",
+							"    pm.expect(pm.response.json()[0].measurementDate).to.equal(\"2019-06-14.05:00:00\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"MeasurmentDate correct\", function () {\r",
+							"    pm.expect(pm.response.json()[pm.response.json().length-1].measurementDate).to.equal(\"2019-06-14.12:30:00\");\r",
 							"});"
 						],
 						"type": "text/javascript"
